@@ -7,13 +7,27 @@ def load_data(file_path):
 
 animals_data = load_data('animals_data.json')
 
+output = ''
+
 for i in animals_data:
-    print("Name:", i["name"])
-    print("Diet:", i["characteristics"]["diet"])
-    print("Location:", i["locations"][0])
+    output += f"Name: {i['name']}\n"
+    output += f"Diet: {i['characteristics']['diet']}\n"
+    output += f"Location: {i['locations'][0]}\n"
     if "type" in i["characteristics"]:
-        print("Type:", i["characteristics"]["type"])
-    print("")
+        output += f"Type: {i['characteristics']['type']}\n\n"
+    else:
+        output += f"\n"
+
+# 3. HTML-Vorlage laden
+with open('animals_template.html', 'r') as file:
+    html_template = file.read()
+
+# 4. Platzhalter ersetzen
+html_content = html_template.replace("__REPLACE_ANIMALS_INFO__", output)
+
+# 5. Neue HTML-Datei schreiben
+with open('animals_template.html', 'w') as file:
+    file.write(html_content)
 
 """
 
