@@ -1,37 +1,46 @@
 import json
 
-
 def load_data(file_path):
+    """Load JSON data from file"""
     with open(file_path, "r") as handle:
         return json.load(handle)
 
-animals_data = load_data('animals_data.json')
+def serialize_animal(animal):
+    """Convert a single animal dictionary into HTML list item"""
+    name = animal.get("name", "Unknown")
+    characteristics = animal.get("characteristics", {})
+    diet = characteristics.get("diet", "Unknown")
+    animal_type = characteristics.get("type", "Unknown")
+    locations = animal.get("locations", [])
+    location = locations[0] if locations else "Unknown"
 
+    return (
+        '<li class="cards__item">\n'
+        f'  <div class="card__title">{name}</div>\n'
+        '  <p class="card__text">\n'
+        f'      <strong>Diet:</strong> {diet}<br/>\n'
+        f'      <strong>Location:</strong> {location}<br/>\n'
+        f'      <strong>Type:</strong> {animal_type}<br/>\n'
+        '  </p>\n'
+        '</li>\n'
+    )
 
-output = ''
-for animal in animals_data:
-    output += '<li class="cards__item">\n'
-    output += f'  <div class="card__title">{animal["name"]}</div>\n'
-    output += '  <p class="card__text">\n'
-    output += f'      <strong>Diet:</strong> {animal["characteristics"]["diet"]}<br/>\n'
-    output += f'      <strong>Location:</strong> {animal["locations"][0]}<br/>\n'
+def build_html(animals_data, template_path, output_path):
+    """Generate HTML file with animal data"""
+    output = ''.join(serialize_animal(animal) for animal in animals_data)
 
+    with open(template_path, "r") as file:
+        html_template = file.read()
 
-    if "type" in animal["characteristics"]:
-        output += f'      <strong>Type:</strong> {animal["characteristics"]["type"]}<br/>\n'
+    html_content = html_template.replace("__REPLACE_ANIMALS_INFO__", output)
 
-    output += '  </p>\n'
-    output += '</li>\n'
+    with open(output_path, "w") as file:
+        file.write(html_content)
 
+def main():
+    animals_data = load_data("animals_data.json")
+    build_html(animals_data, "animals_template.html", "animals.html")
+    print("animals.html generated successfully")
 
-with open('animals_template.html', 'r') as file:
-    html_template = file.read()
-
-
-html_content = html_template.replace("__REPLACE_ANIMALS_INFO__", output)
-
-
-with open('animals.html', 'w') as file:
-    file.write(html_content)
-
-print("HTML-Datei 'animals.html' wurde erstellt!")
+if __name__ == "__main__":
+    main()
